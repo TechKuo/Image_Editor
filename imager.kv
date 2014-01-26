@@ -1,0 +1,240 @@
+#:kivy 1.2
+# imager.ky
+# Dexter Kozen (dck10) and Walker White (wmw2)
+# October 26, 2012
+# This is a Kivy language file that auto-generates the View code
+
+<LoadDialog>:
+    filechooser:filechooser
+    orientation: 'vertical'
+
+    FileChooserIconView:
+        id: filechooser
+        path: '.'
+        filters: ['*.png','*.jpg','*.jpeg','*.gif','*.1110']
+        on_submit: root.load(filechooser.path, filechooser.selection)
+
+    BoxLayout:
+        size_hint_y: None
+        height: 30
+        Button:
+            text: 'Cancel'
+            on_release: root.cancel()
+        Button:
+            text: 'Load'
+            on_release: root.load(filechooser.path, filechooser.selection)
+
+<SaveDialog>:
+    text_input: text_input
+    orientation: 'vertical'
+
+    FileChooserIconView:
+        id: filechooser
+        path: '.'
+        on_selection: text_input.text = self.selection and self.selection[0] or ''
+
+    TextInput:
+        id: text_input
+        size_hint_y: None
+        height: 30
+        multiline: False
+
+    BoxLayout:
+        size_hint_y: None
+        height: 30
+        Button:
+            text: 'Cancel'
+            on_release: root.cancel()
+        Button:
+            text: 'Save'
+            on_release: root.save(filechooser.path, text_input.text)
+
+<ErrorDialog>:
+    orientation: 'vertical'
+    color: 0,0,0,.5
+
+    Label:
+        text: root.label
+        color: 1,1,1,1
+        font_size: 14
+        valign: 'middle'
+        size_hint: 1, 0.9
+
+    Button:
+        text: 'OK'
+        size_hint: 1, 0.1
+        on_release: root.ok()
+
+<WarningDialog>:
+    orientation: 'vertical'
+    color: 0,0,0,.5
+
+    Label:
+        text: root.label
+        color: 1,1,1,1
+        font_size: 14
+        valign: 'middle'
+        size_hint: 1, 0.9
+
+    BoxLayout:
+        size_hint_y: None
+        height: 30
+        Button:
+            text: 'Cancel'
+            on_release: root.cancel()
+        Button:
+            text: 'OK'
+            on_release: root.ok(root.data)
+
+<Main>:
+    grayscale: grayscale
+    hidden_text: hidden_text
+    original_image: original_image
+    current_image: current_image
+    notifier: notifier
+    orientation: 'vertical'
+
+    BoxLayout:
+        orientation: 'horizontal'
+        size_hint_y: None
+        height: 30
+        CheckBox:
+            id: grayscale
+            group: 'tone'
+            size_hint_x: None
+            width: 30
+            active: True
+        Label:
+            text: 'Grayscale'
+            size_hint_x: None
+            width: 12*len(self.text)
+            text_size: (self.width, None)
+        CheckBox:
+            group: 'tone'
+            size_hint_x: None
+            width: 30
+        Label:
+            text: 'Sepia'
+            size_hint_x: None
+            width: 12*len(self.text)
+            text_size: (self.width, None)
+        Label:
+            text: ''
+        Label:
+            id: notifier
+            text: 'Processing...'
+            bold: True
+            color: [0,0,0,0]
+            font_size: 20
+
+    BoxLayout:
+        orientation: 'horizontal'
+
+        BoxLayout:
+            orientation: 'vertical'
+            size_hint_x: .5
+
+            Button:
+                text: 'Restore'
+                on_release: root.do(root.image_processor.restore)
+
+            Button:
+                text: 'Invert'
+                on_release: root.do(root.image_processor.invert)
+
+            Button:
+                text: 'Transpose'
+                on_release: root.do(root.image_processor.transpose)
+
+            Button:
+                text: 'Rotate Left'
+                on_release: root.do(root.image_processor.rotateLeft)
+
+            Button:
+                text: 'Rotate Right'
+                on_release: root.do(root.image_processor.rotateRight)
+
+            Button:
+                text: 'Horizontal Reflect'
+                on_release: root.do(root.image_processor.horizReflect)
+
+            Button:
+                text: 'Vertical Reflect'
+                on_release: root.do(root.image_processor.vertReflect)
+
+            Button:
+                text: 'Monochromify'
+                on_release: root.do(root.image_processor.monochromify, 0 if grayscale.active else 1)
+
+            Button:
+                text: 'Vignette'
+                on_release: root.do(root.image_processor.vignette)
+
+            Button:
+                text: 'Put in Jail'
+                on_release: root.do(root.image_processor.jail)
+
+            Button:
+                text: 'Hide Message'
+                on_release: root.do(root.hide)
+
+            Button:
+                text: 'Reveal Message'
+                on_release: root.do(root.reveal)
+
+            Button:
+                text: 'Fuzzify'
+                on_release: root.do(root.image_processor.fuzzify)
+
+            Button:
+                text: 'Load'
+                on_release: root.load()
+
+            Button:
+                text: 'Save'
+                on_release: root.save()
+
+        Image:
+            id: original_image
+            source: root.source
+            allow_stretch: True
+
+        Image:
+            id: current_image
+            source: root.source
+            allow_stretch: True
+
+    BoxLayout:
+        orientiation: 'Horizontal'
+        size_hint_y: None
+        height: 30
+
+        Label:
+            size_hint: (None,None)
+            height: 30
+            text: ' Message to hide: '
+            halign: 'left'
+            text_size: (self.width, None)
+            size: (200,20)
+
+        Widget:
+            size_hint: (1,None)
+            size: (200,30)
+
+        Button:
+            size_hint: (None,None)
+            text: 'Load Text'
+            on_release: root.loadText()
+            size: (100,30)
+
+    ScrollView:
+        size_hint_y: None
+        height: 100
+        do_scroll: True
+
+        TextInput:
+            id: hidden_text
+            text: '<type hidden message here>'
+            font_size: 10
+            multiline: True
+            background_color: 1, 1, .9, 1
